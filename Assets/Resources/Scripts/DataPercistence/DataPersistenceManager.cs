@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 public class DataPersistenceManager : MonoBehaviour
 {
@@ -11,6 +12,8 @@ public class DataPersistenceManager : MonoBehaviour
     [SerializeField] bool initializeDataIfNull = false;
     [SerializeField] bool overrideSelectedProfileId = false;
     [SerializeField] string testSelectedProfileId = "test";
+
+    public string firstLevelName;
 
     [Header("File Storage Config")]
     [SerializeField] string fileName;
@@ -66,7 +69,7 @@ public class DataPersistenceManager : MonoBehaviour
     {
         this.dataPersistenceObjects = FindAllDataPersistenceObjects();
 
-        if(SceneManager.GetActiveScene().name == "SampleScene")
+        if(SceneManager.GetActiveScene().name == firstLevelName)
         {
             Invoke("LoadGame", 0.0001f);
         }

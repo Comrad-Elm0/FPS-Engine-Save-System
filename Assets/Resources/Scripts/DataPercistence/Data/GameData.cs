@@ -10,15 +10,15 @@ public class GameData
     public Quaternion playerRotation;
     public Quaternion playerCameraRotation;
 
-    //public int primaryWeapon;
-    //public int secondaryWeapon;
+    public float playerHealth;
+    public float playerShield;
+
+    public int playerLvl;
+    public int coins;
     
     public int primaryWeaponAmmoCount;
     public int secondaryWeaponAmmoCount;
     public int currentWeaponInt;
-
-    //public WeaponIdentification weaponOne;
-    //public WeaponIdentification weaponTwo;
 
     public Weapon_SO weaponOne;
     public Weapon_SO weaponTwo;
@@ -28,8 +28,12 @@ public class GameData
     public GameData()
     {
         playerPosition = new Vector3(0, 0, 0);
+        playerHealth = 100f;
+        playerShield = 50f;
         playerRotation = Quaternion.identity;
         playerCameraRotation = Quaternion.identity;
+        playerLvl = 0;
+        coins = 0;
         weaponOne = null;
         weaponTwo = null;
         currentScene = "SampleScene";

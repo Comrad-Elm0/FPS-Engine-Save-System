@@ -9,7 +9,11 @@ public class GameEventsManager : MonoBehaviour, IDataPersistence
 
     private WeaponController _controller;
     private PlayerMovement _playerMovement;
+    private PlayerStats _playerStats;
+    private UIController _uiController;
     private CameraEffects _camera;
+    private ExperienceManager _experienceManager;
+    private CoinManager _coinManager;
 
     private void Awake()
     {
@@ -22,27 +26,36 @@ public class GameEventsManager : MonoBehaviour, IDataPersistence
 
     private void OnEnable()
     {
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        SceneManager.activeSceneChanged += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
+        SceneManager.activeSceneChanged -= OnSceneLoaded;
     }
 
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    void OnSceneLoaded(Scene oldScene, Scene newScene)
     {
         _controller = FindObjectOfType<WeaponController>();
         _playerMovement = FindObjectOfType<PlayerMovement>();
+        _playerStats = FindObjectOfType<PlayerStats>();
+        _uiController = FindObjectOfType<UIController>();
         _camera = FindObjectOfType<CameraEffects>();
+        _experienceManager = FindObjectOfType<ExperienceManager>();
+        _coinManager = FindObjectOfType<CoinManager>();
     }
 
     public void LoadData(GameData gameData)
     {
         _playerMovement.transform.position = gameData.playerPosition;
+        _playerStats.health = gameData.playerHealth;
+        _playerStats.shield = gameData.playerShield;
         _camera.transform.rotation = gameData.playerCameraRotation;
         _camera.GetComponentInParent<MoveCamera>().transform.rotation = gameData.playerRotation;
+        _experienceManager.playerLevel = gameData.playerLvl;
+        _coinManager.AddCoins(gameData.coins);
         
+        // Weapon Things
         _controller.inventory[0] = gameData.weaponOne.weaponObject;
         _controller.inventory[1] = gameData.weaponTwo.weaponObject;
 
@@ -67,6 +80,10 @@ public class GameEventsManager : MonoBehaviour, IDataPersistence
         _controller.currentWeapon = gameData.currentWeaponInt;
 
         _controller.SelectWeapon();
+        
+        _uiController.UpdateHealthUI(gameData.playerHealth, gameData.playerShield, true);
+        _uiController.UpdateCoins(gameData.coins);
+        _uiController.UpdateXP();
     }
 
     public void SaveData(GameData gameData)
@@ -74,8 +91,12 @@ public class GameEventsManager : MonoBehaviour, IDataPersistence
         gameData.currentScene = SceneManager.GetActiveScene().name;
         
         gameData.playerPosition = _playerMovement.transform.position;
+        gameData.playerHealth = _playerStats.health;
+        gameData.playerShield = _playerStats.shield;
         gameData.playerCameraRotation = _camera.transform.rotation;
         gameData.playerRotation = _camera.GetComponentInParent<MoveCamera>().transform.rotation;
+        gameData.playerLvl = _experienceManager.playerLevel + 1;
+        gameData.coins = _coinManager.coins;
         
         gameData.primaryWeaponAmmoCount = _controller.inventory[0].bulletsLeftInMagazine;
         gameData.secondaryWeaponAmmoCount = _controller.inventory[1].bulletsLeftInMagazine;

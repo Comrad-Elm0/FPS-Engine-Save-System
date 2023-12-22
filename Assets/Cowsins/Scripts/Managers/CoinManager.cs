@@ -9,7 +9,7 @@ namespace cowsins
         [Tooltip("Whether the game should use coins.")]
         public bool useCoins; // Flag to indicate if the game uses coins
 
-        public int coins { get; private set; } // Property to access the coin count (read-only from outside)
+        public int coins { get; set; } // Property to access the coin count (read-only from outside)
 
         private void Awake()
         {
