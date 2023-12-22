@@ -1,7 +1,8 @@
 using UnityEngine;
-namespace cowsins {
-public class Stock : Attachment
+namespace cowsins
 {
-    // Place custom code for Stocks here if needed!
-}
+    public class Stock : Attachment
+    {
+        // Place custom code for Stocks here if needed!
+    }
 }

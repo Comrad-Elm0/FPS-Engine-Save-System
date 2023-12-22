@@ -25,8 +25,8 @@ Preset:
     value: 
     objectReference: {fileID: 0}
   - target: {fileID: 0}
-    propertyPath: weaponID
-    value: 5
+    propertyPath: weaponObject
+    value: 
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: _name
@@ -93,12 +93,24 @@ Preset:
     value: 
     objectReference: {fileID: 0}
   - target: {fileID: 0}
+    propertyPath: continuousFire
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
     propertyPath: fireRate
     value: 0.07
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: reloadTime
     value: 2
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: coolSpeed
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: cooledPercentageAfterOverheat
+    value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: infiniteBullets

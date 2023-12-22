@@ -130,7 +130,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 5
   lootInside: {fileID: 0}
-  destroyedSFX: {fileID: 8300000, guid: 1bbef4d186006804985c41ccd16cab75, type: 3}
+  destroyedSFX: {fileID: 8300000, guid: cce208aef373533458de7ea93e504924, type: 3}
   explosionRadius: 10
   explosionForce: 30
   damage: 100

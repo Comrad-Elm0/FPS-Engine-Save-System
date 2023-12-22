@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-namespace cowsins { 
-public class DeathRestart : MonoBehaviour
+namespace cowsins
 {
-    private void Update()
+    public class DeathRestart : MonoBehaviour
     {
-        if (InputManager.reloading) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); 
+        private void Update()
+        {
+            if (InputManager.reloading) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
     }
-}
 }

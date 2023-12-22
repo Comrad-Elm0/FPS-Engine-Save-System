@@ -4,11 +4,14 @@ namespace cowsins
 {
     public class PauseMenu : MonoBehaviour
     {
+        [SerializeField] private GameObject playerUI;
+
+        [SerializeField] private bool disablePlayerUIWhilePaused;
         public static PauseMenu Instance { get; private set; }
 
         public static bool isPaused { get; private set; }
 
-        [HideInInspector]public PlayerStats stats;
+        [HideInInspector] public PlayerStats stats;
 
         [SerializeField] private CanvasGroup menu;
 
@@ -23,7 +26,7 @@ namespace cowsins
             menu.gameObject.SetActive(false);
             menu.alpha = 0;
         }
-        
+
         private void Update()
         {
             if (InputManager.pausing) isPaused = !isPaused;
@@ -34,9 +37,11 @@ namespace cowsins
                 if (!menu.gameObject.activeSelf)
                 {
                     menu.gameObject.SetActive(true);
-                    menu.alpha = 0; 
+                    menu.alpha = 0;
                 }
                 if (menu.alpha < 1) menu.alpha += Time.deltaTime * fadeSpeed;
+
+                if (disablePlayerUIWhilePaused) playerUI.SetActive(false);
             }
             else
             {
@@ -51,6 +56,8 @@ namespace cowsins
             stats.CheckIfCanGrantControl();
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+
+            playerUI.SetActive(true);
         }
 
         public void QuitGame() => Application.Quit();
@@ -62,12 +69,16 @@ namespace cowsins
             {
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
+
+                if (disablePlayerUIWhilePaused) playerUI.SetActive(false);
             }
             else
             {
                 stats.CheckIfCanGrantControl();
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
+
+                playerUI.SetActive(true);
             }
         }
 

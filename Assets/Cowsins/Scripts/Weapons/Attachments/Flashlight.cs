@@ -9,6 +9,11 @@ namespace cowsins
 
         private bool turnedOn;
 
+        private void Start()
+        {
+            turnedOn = false; 
+        }
+
         public void CheckIfCanTurnOn(bool cond)
         {
             // Check if we can turn it on

@@ -80,7 +80,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactable: 0
-  interactText: 'Pick up bullets. '
+  interactText: 'Pick up. '
   events:
     OnPickUp:
       m_PersistentCalls:

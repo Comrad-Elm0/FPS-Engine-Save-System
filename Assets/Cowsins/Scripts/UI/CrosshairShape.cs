@@ -3,28 +3,29 @@ using UnityEditor.Presets;
 #endif
 using UnityEngine;
 
-namespace cowsins {
-public class CrosshairShape : MonoBehaviour
+namespace cowsins
 {
-    #if UNITY_EDITOR
-    public Preset currentPreset;
-
-    public Preset defaultPreset;
-    #endif  
-    [System.Serializable]
-    public class Parts
+    public class CrosshairShape : MonoBehaviour
     {
-        public bool topPart, downPart, leftPart, rightPart, center;
+#if UNITY_EDITOR
+        public Preset currentPreset;
+
+        public Preset defaultPreset;
+#endif
+        [System.Serializable]
+        public class Parts
+        {
+            public bool topPart, downPart, leftPart, rightPart, center;
+        }
+
+        public Parts parts;
+
+        public string presetName;
+
+#if UNITY_EDITOR
+        private void Awake() => ResetCrosshair(defaultPreset);
+
+        private void ResetCrosshair(Preset preset) => CowsinsUtilities.ApplyPreset(preset, this);
+#endif
     }
-
-    public Parts parts;
-
-    public string presetName; 
-
-    #if UNITY_EDITOR
-    private void Start() => ResetCrosshair(defaultPreset);
-
-    private void ResetCrosshair(Preset preset) =>CowsinsUtilities.ApplyPreset(preset, this);
-    #endif
-}
 }

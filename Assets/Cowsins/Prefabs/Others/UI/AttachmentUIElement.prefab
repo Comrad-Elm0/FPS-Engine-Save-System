@@ -129,6 +129,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   background: {fileID: 1446638379938516687}
   iconDisplay: {fileID: 6605769284096897519}
+  atc: {fileID: 0}
+  id: 0
+  assigned: 0
+  assignedColor: {r: 0, g: 0, b: 0, a: 0}
+  unAssignedColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!222 &312737178461891103
 CanvasRenderer:
   m_ObjectHideFlags: 0

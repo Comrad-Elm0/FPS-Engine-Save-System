@@ -1,39 +1,47 @@
 using UnityEngine;
-namespace cowsins {
-public class CameraFOVManager : MonoBehaviour
+
+namespace cowsins
 {
-    [SerializeField] private Rigidbody player;
-
-    private float baseFOV;
-
-    private Camera cam;
-
-    private PlayerMovement movement;
-
-    private WeaponController weapon; 
-
-    private void Start()
+    public class CameraFOVManager : MonoBehaviour
     {
-        cam = GetComponent<Camera>();
-        movement = player.GetComponent<PlayerMovement>();
-        weapon = player.GetComponent<WeaponController>();
+        [SerializeField] private Rigidbody player;
 
-        // Grab the initial field of view
-        baseFOV = cam.fieldOfView; 
-    }
+        private float baseFOV;
+        private Camera cam;
+        private PlayerMovement movement;
+        private WeaponController weapon;
 
-    private void Update()
-    {
-        if (weapon.isAiming && weapon.weapon != null ) return; // Not applicable if we are aiming
-
-        // Do the wallrun motion
-        if(movement.wallRunning && movement.canWallRun) cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, movement.wallrunningFOV, Time.deltaTime * movement.fadeInFOVAmount);
-        else
+        private void Start()
         {
-            // Running motion
-            if(movement.currentSpeed > movement.walkSpeed && player.velocity.magnitude > .2f ) cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, movement.runningFOV, Time.deltaTime * movement.fadeInFOVAmount);
-            else cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, baseFOV, Time.deltaTime * movement.fadeOutFOVAmount); // if we are not wallrunning nor running, go back to normal
+            cam = GetComponent<Camera>();
+            movement = player.GetComponent<PlayerMovement>();
+            weapon = player.GetComponent<WeaponController>();
+
+            baseFOV = movement.normalFOV; // Initialize baseFOV once in Start
+        }
+
+        private void Update()
+        {
+            if (weapon.isAiming && weapon.weapon != null)
+                return; // Not applicable if aiming
+
+            float targetFOV;
+
+            if (movement.wallRunning && movement.canWallRun)
+            {
+                targetFOV = movement.wallrunningFOV;
+            }
+            else if (movement.currentSpeed > movement.walkSpeed && player.velocity.magnitude > 0.2f)
+            {
+                targetFOV = movement.runningFOV;
+            }
+            else
+            {
+                targetFOV = baseFOV;
+            }
+
+            // Smoothly interpolate FOV towards the target value
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFOV, Time.deltaTime * movement.fadeInFOVAmount);
         }
     }
-}
 }

@@ -7,111 +7,115 @@ using UnityEditor;
 #endif
 using UnityEngine;
 using TMPro;
-namespace cowsins {
-public class GetGameInformation : MonoBehaviour
+namespace cowsins
 {
-    //FPS
-    public bool showFps;
-
-    public bool showMinimumAndMaximumFps;
-
-    [SerializeField, Range(.01f, 1f)] private float fpsRefreshRate;
-
-    [SerializeField] private GameObject fpsObject, minFpsObject, maxFpsObject;
-
-    [SerializeField] private Color appropriateValueColor, intermediateValueColor, badValueColor;
-
-    private float fpsTimer;
-
-    private float fps,minFps,maxFps;
-
-    private Transform container;
-
-    private void Start()
+    public class GetGameInformation : MonoBehaviour
     {
-        container = transform.GetChild(0);
-        if(showFps)
-            fpsTimer = fpsRefreshRate;
-        else
-            Destroy(fpsObject);
+        //FPS
+        public bool showFPS;
 
-        if(!showMinimumAndMaximumFps)
+        public bool showMinimumFrameRate, showMaximumFrameRate;
+
+        [SerializeField, Range(.01f, 1f)] private float fpsRefreshRate;
+
+        [SerializeField] private TextMeshProUGUI fpsObject;
+
+        [SerializeField] private Color appropriateValueColor, intermediateValueColor, badValueColor;
+
+        private float fpsTimer;
+
+        private float fps, minFps, maxFps;
+
+        private string text = "";
+
+        private void Start()
         {
-            Destroy(minFpsObject);
-            Destroy(maxFpsObject);
+            if (showFPS)
+                fpsTimer = fpsRefreshRate;
+            else
+                Destroy(fpsObject);
+
+            minFps = float.MaxValue;
         }
-        
-    }
 
-    private void Update()
-    {
-        if (showFps)
+        private void Update()
         {
+            if (!showFPS) return;
+
             fpsTimer -= Time.deltaTime;
-            if(fpsTimer <= 0)
+
+            if (fpsTimer <= 0)
             {
+                text = "";
                 fps = 1.0f / Time.deltaTime;
 
                 if (fps < minFps) minFps = fps;
                 if (fps > maxFps) maxFps = fps;
+
                 fpsTimer = fpsRefreshRate;
+
+                text += "Current FPS: " + GetColoredFPSText(fps) + "\n";
+
+                if (showMinimumFrameRate)
+                    text += "Min FPS: " + GetColoredFPSText(minFps) + "\n";
+
+                if (showMaximumFrameRate)
+                    text += "Max FPS: " + GetColoredFPSText(maxFps);
+
+                fpsObject.text = text;
             }
-            fpsObject.GetComponent<TextMeshProUGUI>().text = "FPS: " + fps.ToString("F0");
 
-            UpdateColorValues(fpsObject.GetComponent<TextMeshProUGUI>(),fps);
+        }
 
-            if(showMinimumAndMaximumFps)
+        private string GetColoredFPSText(float fps)
+        {
+            Color fpsColor;
+
+            if (fps < 15f)
             {
-                minFpsObject.GetComponent<TextMeshProUGUI>().text = "MIN FPS: " + minFps.ToString("F0");
-                maxFpsObject.GetComponent<TextMeshProUGUI>().text = "MAX FPS: " + maxFps.ToString("F0");
-
-                UpdateColorValues(minFpsObject.GetComponent<TextMeshProUGUI>(),minFps);
-                UpdateColorValues(maxFpsObject.GetComponent<TextMeshProUGUI>(),maxFps);
+                fpsColor = badValueColor;
             }
+            else if (fps < 45f)
+            {
+                fpsColor = intermediateValueColor;
+            }
+            else
+            {
+                fpsColor = appropriateValueColor;
+            }
+
+            return "<color=#" + ColorUtility.ToHtmlStringRGB(fpsColor) + ">" + fps.ToString("F0") + "</color>";
         }
     }
-
-    private void UpdateColorValues(TextMeshProUGUI txt, float fpss)
-    {
-        if (fpss < 15) txt.color = badValueColor;
-        else if (fpss > 45) txt.color = appropriateValueColor;
-        else txt.color = intermediateValueColor;
-    }
-
-}
 #if UNITY_EDITOR
-[System.Serializable]
-[CustomEditor(typeof(GetGameInformation))]
-public class GetGameInformatioEditor : Editor
-{
-
-    override public void OnInspectorGUI()
+    [System.Serializable]
+    [CustomEditor(typeof(GetGameInformation))]
+    public class GetGameInformatioEditor : Editor
     {
-        serializedObject.Update();
-        GetGameInformation myScript = target as GetGameInformation;
 
-        EditorGUILayout.LabelField("FPS", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("showFps"));
-            if(myScript.showFps)
-            {       
+        override public void OnInspectorGUI()
+        {
+            serializedObject.Update();
+            GetGameInformation myScript = target as GetGameInformation;
+
+            EditorGUILayout.LabelField("FPS", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("showFPS"));
+            if (myScript.showFPS)
+            {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("fpsRefreshRate"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("fpsObject"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("showMinimumAndMaximumFps"));
-                if(myScript.showMinimumAndMaximumFps)
-                {
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("minFpsObject"));
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("maxFpsObject"));
-                }
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("showMinimumFrameRate"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("showMaximumFrameRate"));
             }
-        EditorGUILayout.Space(10f);
-        EditorGUILayout.LabelField("COLOR", EditorStyles.boldLabel);
+            EditorGUILayout.Space(10f);
+            EditorGUILayout.LabelField("COLOR", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("appropriateValueColor"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("intermediateValueColor"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("badValueColor"));
 
-        serializedObject.ApplyModifiedProperties();
+            serializedObject.ApplyModifiedProperties();
 
+        }
     }
-}
 #endif
 }

@@ -12,16 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d01ed731769af95429c32ba164942b3e, type: 3}
   m_Name: BurstRifle
   m_EditorClassIdentifier: 
-  weaponObject: {fileID: 2632495757580171827, guid: 882232f4c72e05c43a67855d0178ec46, type: 3}
+  weaponObject: {fileID: 4366474878721369578, guid: 4864fda699693f94698e8f2ba33f3538, type: 3}
   _name: Burst Rifle
-  pickUpGraphics: {fileID: 2110658204703941248, guid: 0e05b8f4c454a2241b09550b96f00e3d, type: 3}
-  icon: {fileID: 21300000, guid: f5e1e378b9229bd4c987fac540e79680, type: 3}
+  pickUpGraphics: {fileID: 2092819957812016947, guid: c3f31b2ebdc05184199c4998bfd6aa69, type: 3}
+  icon: {fileID: 21300000, guid: 212058b1098889345a9e0ed05e90ca2b, type: 3}
   shootStyle: 0
   shootMethod: 1
   holdProgressSpeed: 0
   reloadStyle: 0
   projectile: {fileID: 1524923703965971472, guid: 0c78e1b153c7edc4381fa619064969b4, type: 3}
   projectileUsesGravity: 0
+  shootDelay: 0
   bulletDuration: 0
   speed: 40
   explosionOnHit: 0
@@ -31,7 +32,7 @@ MonoBehaviour:
   explosionVFX: {fileID: 0}
   continuousFire: 0
   fireRate: 0.8
-  reloadTime: 2.5
+  reloadTime: 3.5
   coolSpeed: 0
   cooledPercentageAfterOverheat: 0
   infiniteBullets: 0
@@ -43,10 +44,11 @@ MonoBehaviour:
   penetrationAmount: 10
   penetrationDamageReduction: 0.579
   allowAim: 1
-  aimingPosition: {x: -0.28, y: 0.03, z: -0.2}
-  aimingRotation: {x: 0, y: 0, z: 0}
+  aimingPosition: {x: -0.065, y: 0.012, z: -0.2}
+  aimingRotation: {x: 0, y: 0, z: -5}
   aimingSpeed: 30
   aimingFOV: 38
+  allowAimingIfReloading: 0
   movementSpeedWhileAiming: 6
   setMovementSpeedWhileAiming: 1
   crosshairResize: 40
@@ -168,18 +170,21 @@ MonoBehaviour:
   useProceduralShot: 0
   proceduralShotPattern: {fileID: 0}
   audioSFX:
-    firing: {fileID: 8300000, guid: 876fbc1819bf43d42b23009fc2a37876, type: 3}
+    firing: {fileID: 8300000, guid: 99680c4ce87d93b42b2e47a41b25206a, type: 3}
     holster: {fileID: 8300000, guid: b2c939ee2ab26a14b81d51fe66235d2f, type: 3}
-    unholster: {fileID: 8300000, guid: b2c939ee2ab26a14b81d51fe66235d2f, type: 3}
-    reload: {fileID: 8300000, guid: 44e0c079ccb28334b8266b9a67c67645, type: 3}
-    emptyMag: {fileID: 8300000, guid: 5959d65463fbfe342a9219287eb7315f, type: 3}
+    unholster: {fileID: 8300000, guid: 990359cce21d3de47be3a2d99cc5b64e, type: 3}
+    reload: {fileID: 8300000, guid: bd56520de0451944eb2bec300c6a43c3, type: 3}
+    emptyMagReload: {fileID: 8300000, guid: bd56520de0451944eb2bec300c6a43c3, type: 3}
+    emptyMagShoot: {fileID: 8300000, guid: 5959d65463fbfe342a9219287eb7315f, type: 3}
   pitchVariationFiringSFX: 0.15
   camShakeAmount: 0.08
   applyFOVEffectOnShooting: 1
-  FOVValueToSubstract: 5
-  AimingFOVValueToSubstract: 3
+  FOVValueToSubtract: 0
+  AimingFOVValueToSubtract: 0
+  bulletTrail: {fileID: 1436881700163988445, guid: 72fbb691dea891c45a6caa10b437b857, type: 3}
   damagePerHit: 0
   attackRate: 0
+  hitDelay: 0
   attackRange: 0
   dontShowMagazine: 0
   currentPreset: {fileID: 0}

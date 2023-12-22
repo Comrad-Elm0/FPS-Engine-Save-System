@@ -16,40 +16,40 @@ namespace cowsins
     {
         #region variables
         // Inputs
-        public static bool shooting = false, 
-            reloading, 
-            aiming, 
-            jumping, 
-            sprinting, 
-            crouching, 
-            crouchingDown, 
-            interacting, 
-            dropping, 
-            nextweapon, 
-            previousweapon, 
-            inspecting, 
-            melee, 
-            pausing, 
-            dashing, 
+        public static bool shooting = false,
+            reloading,
+            aiming,
+            jumping,
+            sprinting,
+            crouching,
+            crouchingDown,
+            interacting,
+            dropping,
+            nextweapon,
+            previousweapon,
+            inspecting,
+            melee,
+            pausing,
+            dashing,
             invertedAxis,
             yMovementActioned,
             toggleFlashLight;
 
         public static float x,
-            y, 
-            scrolling, 
-            mousex, 
-            mousey, 
-            controllerx, 
-            controllery, 
-            sensitivity_x = 50f, 
-            sensitivity_y = 50f, 
-            controllerSensitivityX = 30f, 
-            controllerSensitivityY = 30f, 
+            y,
+            scrolling,
+            mousex,
+            mousey,
+            controllerx,
+            controllery,
+            sensitivity_x = 50f,
+            sensitivity_y = 50f,
+            controllerSensitivityX = 30f,
+            controllerSensitivityY = 30f,
             aimingSensitivityMultiplier = .5f;
 
-        private bool toggleCrouching, 
-            toggleSprinting, 
+        private bool toggleCrouching,
+            toggleSprinting,
             toggleAiming;
 
         public enum curDevice
@@ -63,7 +63,7 @@ namespace cowsins
 
         private PlayerMovement player;
 
-        private Vector2 moveInput; 
+        private Vector2 moveInput;
 
         #endregion
 
@@ -77,7 +77,7 @@ namespace cowsins
             }
             else Destroy(this.gameObject);
 
-            Init(); 
+            Init();
 
         }
 
@@ -132,11 +132,11 @@ namespace cowsins
                 controllery = -Gamepad.current.rightStick.y.ReadValue();
             }
 
-            moveInput = inputActions.GameControls.Movement.ReadValue<Vector2>(); 
+            moveInput = inputActions.GameControls.Movement.ReadValue<Vector2>();
             x = moveInput.x;
             y = moveInput.y;
 
-            yMovementActioned =  y > 0;
+            yMovementActioned = y > 0;
 
             reloading = inputActions.GameControls.Reloading.ReadValue<float>() > 0;
             melee = inputActions.GameControls.Melee.ReadValue<float>() > 0;
@@ -184,7 +184,7 @@ namespace cowsins
 
             interacting = inputActions.GameControls.Interacting.ReadValue<float>() > 0;
             dropping = inputActions.GameControls.Drop.ReadValue<float>() > 0;
-            
+
             inspecting = inputActions.GameControls.Inspect.ReadValue<float>() > 0;
 
             if (toggleFlashLight) toggleFlashLight = false;
@@ -195,7 +195,7 @@ namespace cowsins
             if (jumping) jumping = false;
             y = inputActions.GameControls.Movement.ReadValue<Vector2>().y;
 
-            if (dashing) dashing = false;            
+            if (dashing) dashing = false;
         }
 
         #region others

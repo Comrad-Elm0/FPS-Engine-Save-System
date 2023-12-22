@@ -3,28 +3,29 @@ using UnityEngine.InputSystem;
 #endif
 using UnityEngine;
 using TMPro;
-namespace cowsins {
-public class DisplayKey : MonoBehaviour
+namespace cowsins
 {
-    public static PlayerActions inputActions;
-
-    private void Awake()
+    public class DisplayKey : MonoBehaviour
     {
-        if (inputActions == null)
+        public static PlayerActions inputActions;
+
+        private void Awake()
         {
-            inputActions = new PlayerActions();
-            inputActions.Enable();
+            if (inputActions == null)
+            {
+                inputActions = new PlayerActions();
+                inputActions.Enable();
+            }
+
         }
 
-    }
+        private void Update() => Repaint();
 
-    private void Update() => Repaint();
-
-    public void Repaint()
-    {
-        TextMeshProUGUI txt = GetComponent<TextMeshProUGUI>();
-        string device = DeviceDetection.Instance.mode == DeviceDetection.InputMode.Keyboard ? "Keyboard" : "Controller";
-        txt.text = inputActions.GameControls.Interacting.GetBindingDisplayString(InputBinding.MaskByGroup(device));
+        public void Repaint()
+        {
+            TextMeshProUGUI txt = GetComponent<TextMeshProUGUI>();
+            string device = DeviceDetection.Instance.mode == DeviceDetection.InputMode.Keyboard ? "Keyboard" : "Controller";
+            txt.text = inputActions.GameControls.Interacting.GetBindingDisplayString(InputBinding.MaskByGroup(device));
+        }
     }
-}
 }

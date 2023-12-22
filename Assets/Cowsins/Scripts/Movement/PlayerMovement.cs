@@ -12,7 +12,7 @@ namespace cowsins
     // Add a rigidbody if needed, PlayerMovement.cs requires a rigidbody to work 
     [RequireComponent(typeof(Rigidbody))]
     //[RequireComponent(typeof(____))] Player Movement also requires a non trigger collider. Attach your preffered collider method
-    public class PlayerMovement : MonoBehaviour, IDataPersistence
+    public class PlayerMovement : MonoBehaviour
     {
 
         #region others
@@ -26,6 +26,11 @@ namespace cowsins
         public class FootStepsAudio // store your footsteps audio
         {
             public AudioClip[] defaultStep, grassStep, metalStep, mudStep, woodStep;
+        }
+        [System.Serializable]
+        public enum CrouchCancelMethod // Different methods to dettermine how crouch should stop
+        {
+            Smooth, FullStop
         }
         [System.Serializable]
         public enum CancelWallRunMethod // Different methods to dettermine when wallrun should stop
@@ -85,6 +90,10 @@ namespace cowsins
 
         [Tooltip("Maximum allowed speed.")]
         public float currentSpeed = 20;
+
+        public bool allowCrouch;
+
+        public CrouchCancelMethod crouchCancelMethod;
 
         [Min(0.01f)]
         public float runSpeed, walkSpeed, crouchSpeed, crouchTransitionSpeed;
@@ -148,7 +157,9 @@ namespace cowsins
 
         public bool ReadyToJump { get { return readyToJump; } }
 
-        [Tooltip("Amount of jumps you can do without touching the ground")][Min(1)] public int maxJumps;
+        [Tooltip("Enable this if your player can jump.")] public bool allowJump;
+
+        [Tooltip("Amount of jumps you can do without touching the ground")] [Min(1)] public int maxJumps;
 
         [Tooltip("Gains jump amounts when wallrunning.")] public bool resetJumpsOnWallrun;
 
@@ -156,7 +167,7 @@ namespace cowsins
 
         [Tooltip("Double jump will reset fall damage, only if your player controller is optable to take fall damage")] public bool doubleJumpResetsFallDamage;
 
-        [Tooltip("Interval between jumping")][Min(.25f), SerializeField] private float jumpCooldown = .25f;
+        [Tooltip("Interval between jumping")] [Min(.25f), SerializeField] private float jumpCooldown = .25f;
 
         [Range(0, .3f), Tooltip("Coyote jump allows users to perform more satisfactory and responsive jumps, especially when jumping off surfaces")] public float coyoteJumpTime;
 
@@ -333,9 +344,18 @@ namespace cowsins
 
         [Tooltip("Wallrunning field of view of your camera"), Range(1, 179)] public float wallrunningFOV;
 
+        [Tooltip("Amount of field of view that will be added to your camera when dashing."), Range(-179, 179)] public float fovToAddOnDash;
+
         [Tooltip("Fade Speed - Start Transition for the field of view")] public float fadeInFOVAmount;
 
         [Tooltip("Fade Speed - Finish Transition for the field of view")] public float fadeOutFOVAmount;
+
+        [System.Serializable]
+        public class Sounds
+        {
+            public AudioClip jumpSFX, landSFX;
+        }
+        [SerializeField] private Sounds sounds;
 
         #endregion
 
@@ -377,62 +397,84 @@ namespace cowsins
         {
             if (canWallBounce) CheckOppositeWall();
 
-            if (InputManager.jumping && wallOpposite && canWallBounce && PlayerStats.Controllable && InputManager.y > 0 && CheckHeight()) WallBounce();
+            if (InputManager.jumping && wallOpposite && canWallBounce && PlayerStats.Controllable && CheckHeight()) WallBounce();
         }
-
-        public void SaveData(GameData data)
-        {
-            data.playerPosition = this.gameObject.transform.position;
-        }
-
-        public void LoadData(GameData data)
-        {
-            this.gameObject.transform.position = data.playerPosition;
-        }
-
         public void HandleVelocities()
         {
 
             HandleSpeedLines();
-            if (isCrouching) return;
+
+            if (isCrouching)
+                return;
+
             if (weapon.weapon != null && weapon.isAiming && weapon.weapon.setMovementSpeedWhileAiming)
             {
                 currentSpeed = weapon.weapon.movementSpeedWhileAiming;
                 return;
             }
+
             if ((InputManager.sprinting || autoRun) && canRun)
             {
-                if (!canRunBackwards && InputManager.y < 0 || !canRunWhileShooting && InputManager.shooting && weapon.weapon != null)
-                    currentSpeed = Mathf.MoveTowards(currentSpeed, walkSpeed, Time.deltaTime * loseSpeedDeceleration);
-                if (canRunBackwards || !canRunBackwards && Vector3.Dot(orientation.forward, rb.velocity) > 0)
+                bool shouldRun = true;
+                if (!canRunBackwards && InputManager.y < 0 || (!canRunWhileShooting && InputManager.shooting && weapon.weapon != null))
                 {
-                    if (!canRunWhileShooting && !InputManager.shooting || canRunWhileShooting)
+                    currentSpeed = Mathf.MoveTowards(currentSpeed, walkSpeed, Time.deltaTime * loseSpeedDeceleration);
+                    shouldRun = false;
+                }
+
+                if (shouldRun && (canRunBackwards || Vector3.Dot(orientation.forward, rb.velocity) > 0))
+                {
+                    if (canRunWhileShooting || !InputManager.shooting)
                     {
                         currentSpeed = runSpeed;
                     }
                 }
             }
-            else currentSpeed = walkSpeed;
+            else
+            {
+                currentSpeed = walkSpeed;
+            }
 
-            if (rb.velocity.magnitude < .01f) currentSpeed = walkSpeed;
+            if (rb.velocity.sqrMagnitude < 0.0001f)
+            {
+                currentSpeed = walkSpeed;
+            }
+
         }
 
         public void HandleSpeedLines()
         {
-            // Check if we want to use speedlines. If false, return.
-            if (!useSpeedLines) return;
+            if (speedLines == null) return;
+            // Check if we want to use speedlines. If false, stop and return.
+            if (!useSpeedLines || PauseMenu.isPaused)
+            {
+                speedLines.Stop();
+                return;
+            }
 
-            if (rb.velocity.magnitude > minSpeedToUseSpeedLines) speedLines.Play(); // Play speedlines
-            else speedLines.Stop(); // Stop speedlines
+            if (rb.velocity.sqrMagnitude > minSpeedToUseSpeedLines * minSpeedToUseSpeedLines)
+            {
+                speedLines.Play(); // Play speedlines
+            }
+            else
+            {
+                speedLines.Stop(); // Stop speedlines
+            }
 
             // HandleEmission
             var emission = speedLines.emission;
-            emission.rateOverTime = (rb.velocity.magnitude > runSpeed) ? 200 * speedLinesAmount : 70 * speedLinesAmount;
+            float emissionRate = (rb.velocity.magnitude > runSpeed) ? 200 : 70;
+            emission.rateOverTime = emissionRate * speedLinesAmount;
         }
+
+
         public void StartCrouch()
         {
+            if (!allowCrouch) return;
             isCrouching = true;
-            currentSpeed = crouchSpeed;
+
+            if (crouchCancelMethod == CrouchCancelMethod.FullStop)
+                currentSpeed = crouchSpeed;
 
             if (rb.velocity.magnitude >= walkSpeed && grounded && allowSliding && !hasJumped)
             { // Handle sliding
@@ -450,7 +492,7 @@ namespace cowsins
             transform.localScale = Vector3.MoveTowards(transform.localScale, playerScale, Time.deltaTime * crouchTransitionSpeed);
         }
 
-        void Stamina()
+        private void Stamina()
         {
             // Check if we def wanna use stamina
             if (!usesStamina || stats.isDead || !PlayerStats.Controllable) return;
@@ -525,7 +567,7 @@ namespace cowsins
 
             float multiplier2 = (weapon.weapon != null) ? weapon.weapon.weightMultiplier : 1;
 
-            if (rb.velocity.magnitude < .02f) rb.velocity = Vector3.zero;
+            if (rb.velocity.sqrMagnitude < .02f) rb.velocity = Vector3.zero;
 
             if (!move)
             {
@@ -543,7 +585,7 @@ namespace cowsins
         public void FootSteps()
         {
             // Reset timer if conditions are met + dont play the footsteps
-            if (!grounded || rb.velocity.magnitude <= .1f)
+            if (!grounded || rb.velocity.sqrMagnitude <= .1f)
             {
                 stepTimer = 1 - footstepSpeed;
                 return;
@@ -594,6 +636,8 @@ namespace cowsins
 
         public void Jump()
         {
+            if (!allowJump) return;
+
             jumpCount--;
             readyToJump = false;
             hasJumped = true;
@@ -635,6 +679,8 @@ namespace cowsins
             //staminaLoss
             if (usesStamina) stamina -= staminaLossOnJump;
 
+
+            SoundManager.Instance.PlaySound(sounds.jumpSFX, 0, 0, false, 0);
             Invoke(nameof(ResetJump), jumpCooldown);
         }
 
@@ -698,7 +744,7 @@ namespace cowsins
             if (!grounded || InputManager.jumping || hasJumped) return;
 
             //Slow down sliding + prevent from infinite sliding
-            if (InputManager.crouching)
+            if (InputManager.crouching && allowCrouch)
             {
                 rb.AddForce(acceleration * Time.deltaTime * -rb.velocity.normalized * slideCounterMovement);
                 return;
@@ -711,6 +757,7 @@ namespace cowsins
             if (Math.Abs(mag.y) > threshold && Math.Abs(y) < 0.05f || (mag.y < -threshold && y > 0) || (mag.y > threshold && y < 0))
                 rb.AddForce(acceleration * orientation.transform.forward * Time.deltaTime * -mag.y * frictionForceAmount);
 
+            if (Math.Abs(x) < 0.05f && Math.Abs(y) < 0.05f && grounded && floorAngle > 0) rb.AddForce(acceleration * -rb.velocity * Time.deltaTime);
 
             //Limit diagonal running. This will also cause a full stop if sliding fast and un-crouching, so not optimal.
             if (Mathf.Sqrt((Mathf.Pow(rb.velocity.x, 2) + Mathf.Pow(rb.velocity.z, 2))) > currentSpeed)
@@ -748,6 +795,12 @@ namespace cowsins
             float angle = Vector3.Angle(Vector3.up, v);
             return angle < maxSlopeAngle;
         }
+
+        private float FloorAngle(Vector3 v)
+        {
+            float angle = Vector3.Angle(Vector3.up, v);
+            return angle;
+        }
         /// <summary>
         /// Basically find everything the script needs to work
         /// </summary>
@@ -769,6 +822,7 @@ namespace cowsins
 
         private bool cancellingGrounded;
 
+        private float floorAngle;
         /// <summary>
         /// Handle ground detection
         /// </summary>
@@ -787,6 +841,8 @@ namespace cowsins
                 {
                     if (!grounded)
                     {
+
+                        SoundManager.Instance.PlaySound(sounds.landSFX, 0, 0, false, 0);
                         events.OnLand.Invoke(); // We have just landed
                         jumpCount = maxJumps; // Reset jumps left
                         hasJumped = false;
@@ -796,6 +852,7 @@ namespace cowsins
                     normalVector = normal;
                     CancelInvoke(nameof(StopGrounded));
                 }
+                floorAngle = FloorAngle(normal);
             }
 
             float delay = 3f;

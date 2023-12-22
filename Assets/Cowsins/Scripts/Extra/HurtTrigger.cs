@@ -1,11 +1,12 @@
 using UnityEngine;
-namespace cowsins {
-public class HurtTrigger : MonoBehaviour
+namespace cowsins
 {
-    [SerializeField] private float damage; 
-    private void OnTriggerEnter(Collider other)
+    public class HurtTrigger : MonoBehaviour
     {
-        if (other.CompareTag("Player")) other.GetComponent<PlayerStats>().Damage(damage); 
+        [SerializeField] private float damage;
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.CompareTag("Player")) other.GetComponent<PlayerStats>().Damage(damage);
+        }
     }
-}
 }

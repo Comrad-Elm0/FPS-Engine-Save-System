@@ -1,3 +1,4 @@
+using System;
 using cowsins;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -6,7 +7,9 @@ public class GameEventsManager : MonoBehaviour, IDataPersistence
 {
     public static GameEventsManager instance { get; private set; }
 
-    private WeaponController controller;
+    private WeaponController _controller;
+    private PlayerMovement _playerMovement;
+    private CameraEffects _camera;
 
     private void Awake()
     {
@@ -15,48 +18,72 @@ public class GameEventsManager : MonoBehaviour, IDataPersistence
             Debug.LogError("Found more than one Game Events Manager in the scene.");
         }
         instance = this;
+    }
 
-        controller = FindObjectOfType<WeaponController>();
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        _controller = FindObjectOfType<WeaponController>();
+        _playerMovement = FindObjectOfType<PlayerMovement>();
+        _camera = FindObjectOfType<CameraEffects>();
     }
 
     public void LoadData(GameData gameData)
     {
-        controller.inventory[0] = gameData.weaponOne.weaponObject;
-        controller.inventory[1] = gameData.weaponTwo.weaponObject;
+        _playerMovement.transform.position = gameData.playerPosition;
+        _camera.transform.rotation = gameData.playerCameraRotation;
+        _camera.GetComponentInParent<MoveCamera>().transform.rotation = gameData.playerRotation;
+        
+        _controller.inventory[0] = gameData.weaponOne.weaponObject;
+        _controller.inventory[1] = gameData.weaponTwo.weaponObject;
 
-        var wepOne = Instantiate(gameData.weaponOne.weaponObject, controller.weaponHolder);
+        var wepOne = Instantiate(gameData.weaponOne.weaponObject, _controller.weaponHolder);
         wepOne.transform.localPosition = gameData.weaponOne.weaponObject.transform.localPosition;
 
-        var wepTwo = Instantiate(gameData.weaponTwo.weaponObject, controller.weaponHolder);
+        var wepTwo = Instantiate(gameData.weaponTwo.weaponObject, _controller.weaponHolder);
         wepTwo.transform.localPosition = gameData.weaponTwo.weaponObject.transform.localPosition;
 
-        controller.inventory[0] = wepOne;
-        controller.inventory[1] = wepTwo;
-        controller.weapon = wepOne.weapon;
+        _controller.inventory[0] = wepOne;
+        _controller.inventory[1] = wepTwo;
+        _controller.weapon = wepOne.weapon;
 
-        controller.slots[0].weapon = wepOne.weapon;
-        controller.slots[0].GetImage();
+        _controller.slots[0].weapon = wepOne.weapon;
+        _controller.slots[0].GetImage();
 
-        controller.slots[1].weapon = wepTwo.weapon;
-        controller.slots[1].GetImage();
+        _controller.slots[1].weapon = wepTwo.weapon;
+        _controller.slots[1].GetImage();
 
-        controller.inventory[0].bulletsLeftInMagazine = gameData.primaryWeaponAmmoCount;
-        controller.inventory[1].bulletsLeftInMagazine = gameData.secondaryWeaponAmmoCount;
-        controller.currentWeapon = gameData.currentWeaponInt;
+        _controller.inventory[0].bulletsLeftInMagazine = gameData.primaryWeaponAmmoCount;
+        _controller.inventory[1].bulletsLeftInMagazine = gameData.secondaryWeaponAmmoCount;
+        _controller.currentWeapon = gameData.currentWeaponInt;
 
-        controller.SelectWeapon();
+        _controller.SelectWeapon();
     }
 
     public void SaveData(GameData gameData)
     {
         gameData.currentScene = SceneManager.GetActiveScene().name;
-
-        gameData.weaponOne = controller.inventory[0].weapon;
-        gameData.weaponTwo = controller.inventory[1].weapon;
         
-        gameData.primaryWeaponAmmoCount = controller.inventory[0].bulletsLeftInMagazine;
-        gameData.secondaryWeaponAmmoCount = controller.inventory[1].bulletsLeftInMagazine;
-        gameData.currentWeaponInt = controller.currentWeapon;
+        gameData.playerPosition = _playerMovement.transform.position;
+        gameData.playerCameraRotation = _camera.transform.rotation;
+        gameData.playerRotation = _camera.GetComponentInParent<MoveCamera>().transform.rotation;
+        
+        gameData.primaryWeaponAmmoCount = _controller.inventory[0].bulletsLeftInMagazine;
+        gameData.secondaryWeaponAmmoCount = _controller.inventory[1].bulletsLeftInMagazine;
+
+        gameData.weaponOne = _controller.inventory[0].weapon;
+        gameData.weaponTwo = _controller.inventory[1].weapon;
+        
+        gameData.currentWeaponInt = _controller.currentWeapon;
 
     }
 }

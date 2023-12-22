@@ -1,77 +1,84 @@
-namespace cowsins {
-using UnityEngine;
-public class WeaponInspectState : WeaponBaseState
+namespace cowsins
 {
-    private WeaponController controller;
-
-    private InteractManager interact;
-
-    private PlayerStats stats;
-
-    private float timer; 
-    public WeaponInspectState(WeaponStates currentContext, WeaponStateFactory playerStateFactory)
-        : base(currentContext, playerStateFactory) { }
-
-    public override void EnterState()
+    using UnityEngine;
+    public class WeaponInspectState : WeaponBaseState
     {
-        controller = _ctx.GetComponent<WeaponController>();
-        interact = _ctx.GetComponent<InteractManager>(); 
-        stats = _ctx.GetComponent<PlayerStats>();
+        private WeaponController controller;
 
-        controller.InitializeInspection();
+        private InteractManager interact;
 
-        timer = 0;
+        private PlayerStats stats;
 
-        if (!interact.realtimeAttachmentCustomization) return; 
+        PlayerMovement player;
 
-        interact.inspecting = true;
-        _ctx.inspectionUI.gameObject.SetActive(true);
-        _ctx.inspectionUI.alpha = 0;  
+        private float timer;
+        public WeaponInspectState(WeaponStates currentContext, WeaponStateFactory playerStateFactory)
+            : base(currentContext, playerStateFactory) { }
 
-        interact.GenerateInspectionUI();
+        public override void EnterState()
+        {
+            player = _ctx.GetComponent<PlayerMovement>();
+            controller = _ctx.GetComponent<WeaponController>();
+            interact = _ctx.GetComponent<InteractManager>();
+            stats = _ctx.GetComponent<PlayerStats>();
 
-        UnlockMouse();
+            controller.InitializeInspection();
+
+            timer = 0;
+            interact.inspecting = true;
+
+            if (!interact.realtimeAttachmentCustomization) return;
+
+            _ctx.inspectionUI.gameObject.SetActive(true);
+            _ctx.inspectionUI.alpha = 0;
+
+            interact.GenerateInspectionUI();
+
+            UnlockMouse();
+        }
+
+
+        public override void UpdateState()
+        {
+
+            if (interact.realtimeAttachmentCustomization) stats.LoseControl();
+
+            if (timer <= 1) timer += Time.deltaTime;
+
+            controller.StopAim();
+
+            CheckSwitchState();
+        }
+
+        public override void FixedUpdateState() { }
+        public override void InitializeSubState() { }
+        public override void ExitState()
+        {
+
+            interact.inspecting = false;
+            controller.DisableInspection();
+            stats.CheckIfCanGrantControl();
+
+            LockMouse();
+
+            UIEvents.onEnableAttachmentUI?.Invoke(null);
+        }
+        public override void CheckSwitchState()
+        {
+            if (timer < 1) return;
+            if (InputManager.inspecting || InputManager.shooting || player.currentSpeed == player.runSpeed) SwitchState(_factory.Default());
+        }
+
+        private void UnlockMouse()
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+
+        private void LockMouse()
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
-
-
-    public override void UpdateState()
-    {
-        if(interact.realtimeAttachmentCustomization) stats.LoseControl();
-
-        if(timer <= 1) timer += Time.deltaTime; 
-
-        CheckSwitchState();
-
-        controller.StopAim(); 
-    }
-
-    public override void FixedUpdateState() { }
-    public override void InitializeSubState() { }
-    public override void ExitState()
-    {
-        interact.inspecting = false;
-        controller.DisableInspection();
-        stats.CheckIfCanGrantControl();
-
-        LockMouse();
-
-        UIEvents.onEnableAttachmentUI?.Invoke(null); 
-    }
-    public override void CheckSwitchState()
-    {
-        if (InputManager.inspecting && timer >= 1) SwitchState(_factory.Default()); 
-    }
-
-    private void UnlockMouse()
-    {
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-    }
-
-    private void LockMouse()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-    }
-}
 }

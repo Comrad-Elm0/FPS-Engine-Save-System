@@ -1,5 +1,8 @@
 using UnityEngine;
-namespace cowsins {
+using UnityEditor;
+
+namespace cowsins
+{
     public class WeaponPickeable : Pickeable
     {
         [Tooltip("Which weapon are we grabbing")] public Weapon_SO weapon;
@@ -20,11 +23,12 @@ namespace cowsins {
             GetVisuals();
             currentBullets = weapon.magazineSize;
             totalBullets = weapon.totalMagazines * weapon.magazineSize;
-            SetDefaultAttachments(); 
+            SetDefaultAttachments();
         }
 
         public override void Interact()
         {
+            base.Interact();
             WeaponController inv = player.GetComponent<WeaponController>();
 
             if (!CheckIfInventoryFull())
@@ -48,10 +52,11 @@ namespace cowsins {
             // Apply attachments to the weapon
             ApplyAttachments(inv);
             //Since this slot is selected, let´s unholster it
-            inv.UnHolster(inv.inventory[inv.currentWeapon].gameObject,true);
+            inv.UnHolster(inv.inventory[inv.currentWeapon].gameObject, true);
             // Set bullets
-            inv.inventory[inv.currentWeapon].GetComponent<WeaponIdentification>().bulletsLeftInMagazine = currentBullets;
-            inv.inventory[inv.currentWeapon].GetComponent<WeaponIdentification>().totalBullets = totalBullets;
+            WeaponIdentification curWeapon = inv.inventory[inv.currentWeapon].GetComponent<WeaponIdentification>();
+            curWeapon.bulletsLeftInMagazine = currentBullets;
+            curWeapon.totalBullets = totalBullets;
             //UI
             inv.slots[inv.currentWeapon].weapon = weapon;
             inv.slots[inv.currentWeapon].GetImage();
@@ -59,15 +64,15 @@ namespace cowsins {
             currentBullets = saveBulletsLeftInMagazine;
             totalBullets = saveTotalBullets;
 
-    #if UNITY_EDITOR
-                UIController.instance.crosshair.GetComponent<CrosshairShape>().currentPreset = inv.weapon.crosshairPreset;
-                CowsinsUtilities.ApplyPreset(UIController.instance.crosshair.GetComponent<CrosshairShape>().currentPreset, UIController.instance.crosshair.GetComponent<CrosshairShape>());
-    #endif
+#if UNITY_EDITOR
+            UIController.instance.crosshair.GetComponent<CrosshairShape>().currentPreset = inv.weapon.crosshairPreset;
+            CowsinsUtilities.ApplyPreset(UIController.instance.crosshair.GetComponent<CrosshairShape>().currentPreset, UIController.instance.crosshair.GetComponent<CrosshairShape>());
+#endif
 
-                weapon = oldWeapon;
-                image.sprite = weapon.icon;
-                Destroy(graphics.transform.GetChild(0).gameObject);
-                GetVisuals();
+            weapon = oldWeapon;
+            image.sprite = weapon.icon;
+            Destroy(graphics.transform.GetChild(0).gameObject);
+            GetVisuals();
         }
 
         private bool CheckIfInventoryFull()
@@ -89,22 +94,23 @@ namespace cowsins {
                         inv.inventory[i].gameObject.SetActive(true);
                         inv.weapon = weapon;
                         ApplyAttachments(inv);
-                        inv.UnHolster(weaponPicked.gameObject,true);
+                        inv.UnHolster(weaponPicked.gameObject, true);
                     }
                     else inv.inventory[i].gameObject.SetActive(false);
                     // Set bullets
-                    inv.inventory[i].GetComponent<WeaponIdentification>().bulletsLeftInMagazine = currentBullets;
-                    inv.inventory[i].GetComponent<WeaponIdentification>().totalBullets = totalBullets;
+                    WeaponIdentification curWeapon = inv.inventory[i].GetComponent<WeaponIdentification>();
+                    curWeapon.bulletsLeftInMagazine = currentBullets;
+                    curWeapon.totalBullets = totalBullets;
                     //UI
                     inv.slots[i].weapon = weapon;
                     inv.slots[i].GetImage();
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
                     if (inv.weapon != null)
                     {
                         UIController.instance.crosshair.GetComponent<CrosshairShape>().currentPreset = inv.weapon.crosshairPreset;
                         CowsinsUtilities.ApplyPreset(UIController.instance.crosshair.GetComponent<CrosshairShape>().currentPreset, UIController.instance.crosshair.GetComponent<CrosshairShape>());
                     }
-    #endif
+#endif
 
                     // Don´t return true
                     return false;
@@ -117,7 +123,7 @@ namespace cowsins {
 
         public override void Drop(WeaponController wcon, Transform orientation)
         {
-            base.Drop(wcon,orientation); 
+            base.Drop(wcon, orientation);
 
             currentBullets = wcon.id.bulletsLeftInMagazine;
             totalBullets = wcon.id.totalBullets;
@@ -128,14 +134,15 @@ namespace cowsins {
         // Applied the default attachments to the weapon
         private void SetDefaultAttachments()
         {
-                DefaultAttachment defaultAttachments = weapon.weaponObject.defaultAttachments;
-                Barrel = defaultAttachments.defaultBarrel?.attachmentIdentifier;
-                Scope = defaultAttachments.defaultScope?.attachmentIdentifier;
-                Stock = defaultAttachments.defaultStock?.attachmentIdentifier;
-                Grip = defaultAttachments.defaultGrip?.attachmentIdentifier;
-                Magazine = defaultAttachments.defaultMagazine?.attachmentIdentifier;
-                Laser = defaultAttachments.defaultLaser?.attachmentIdentifier;
-         }
+            DefaultAttachment defaultAttachments = weapon.weaponObject.defaultAttachments;
+            Barrel = defaultAttachments.defaultBarrel?.attachmentIdentifier;
+            Scope = defaultAttachments.defaultScope?.attachmentIdentifier;
+            Stock = defaultAttachments.defaultStock?.attachmentIdentifier;
+            Grip = defaultAttachments.defaultGrip?.attachmentIdentifier;
+            Flashlight = defaultAttachments.defaultFlashlight?.attachmentIdentifier;
+            Magazine = defaultAttachments.defaultMagazine?.attachmentIdentifier;
+            Laser = defaultAttachments.defaultLaser?.attachmentIdentifier;
+        }
         /// <summary>
         /// Stores the attachments on the WeaponPickeable so they can be accessed later in case the weapon is picked up.
         /// </summary>
@@ -147,7 +154,7 @@ namespace cowsins {
             Grip = gr?.attachmentIdentifier;
             Magazine = mag?.attachmentIdentifier;
             Flashlight = fl?.attachmentIdentifier;
-            Laser = ls?.attachmentIdentifier; 
+            Laser = ls?.attachmentIdentifier;
         }
         public void GetVisuals()
         {
@@ -178,12 +185,12 @@ namespace cowsins {
         /// <param name="atcToCheck">Attachment object to get information about returned.</param>
         /// <param name="wID">Weapon Identification that holds the attachments</param>
         /// <returns></returns>
-        private (Attachment, int) GetAttachmentID(AttachmentIdentifier_SO atcToCheck,WeaponIdentification wID)
+        private (Attachment, int) GetAttachmentID(AttachmentIdentifier_SO atcToCheck, WeaponIdentification wID)
         {
             // Check for compatibility
             for (int i = 0; i < wID.compatibleAttachments.barrels.Length; i++)
             {
-                if (atcToCheck == wID.compatibleAttachments.barrels[i].attachmentIdentifier) return (wID.compatibleAttachments.barrels[i], i); 
+                if (atcToCheck == wID.compatibleAttachments.barrels[i].attachmentIdentifier) return (wID.compatibleAttachments.barrels[i], i);
             }
             for (int i = 0; i < wID.compatibleAttachments.scopes.Length; i++)
             {
@@ -211,7 +218,67 @@ namespace cowsins {
             }
 
             // Return an error
-            return (null, -1); 
+            return (null, -1);
         }
     }
+
+#if UNITY_EDITOR
+
+    [System.Serializable]
+    [CustomEditor(typeof(WeaponPickeable))]
+    public class WeaponPickeableEditor : Editor
+    {
+        private string[] tabs = { "Basic", "References", "Effects", "Events" };
+        private int currentTab = 0;
+
+        override public void OnInspectorGUI()
+        {
+            serializedObject.Update();
+            WeaponPickeable myScript = target as WeaponPickeable;
+
+            Texture2D myTexture = Resources.Load<Texture2D>("CustomEditor/WeaponPickeable_CustomEditor") as Texture2D;
+            GUILayout.Label(myTexture);
+
+            EditorGUILayout.BeginVertical();
+            currentTab = GUILayout.Toolbar(currentTab, tabs);
+            EditorGUILayout.Space(10f);
+            EditorGUILayout.EndVertical();
+            #region variables
+
+            if (currentTab >= 0 || currentTab < tabs.Length)
+            {
+                switch (tabs[currentTab])
+                {
+                    case "Basic":
+                        EditorGUILayout.LabelField("CUSTOMIZE YOUR WEAPON PICKEABLE", EditorStyles.boldLabel);
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("weapon"));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("interactText"));
+                        break;
+                    case "References":
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("image"));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("graphics"));
+
+                        break;
+                    case "Effects":
+                        EditorGUILayout.LabelField("EFFECTS", EditorStyles.boldLabel);
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("rotates"));
+                        if (myScript.rotates) EditorGUILayout.PropertyField(serializedObject.FindProperty("rotationSpeed"));
+
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("translates"));
+                        if (myScript.translates) EditorGUILayout.PropertyField(serializedObject.FindProperty("translationSpeed"));
+                        break;
+                    case "Events":
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("events"));
+                        break;
+
+                }
+            }
+
+            #endregion
+
+            serializedObject.ApplyModifiedProperties();
+
+        }
+    }
+#endif
 }

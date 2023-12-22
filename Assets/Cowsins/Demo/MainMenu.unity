@@ -8662,7 +8662,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 1a6841647031a1440a3a81262422bbea, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3096a53208f4ca24fa221c7aa55033f0, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -8953,7 +8953,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: FPS ENGINE by COWSINS - v.0.9.5
+  m_text: 'FPS ENGINE by COWSINS - v.0.9.9
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8bb652ce1b8581a4dbab03c570abaa67, type: 2}
   m_sharedMaterial: {fileID: 2866433745113410533, guid: 8bb652ce1b8581a4dbab03c570abaa67, type: 2}
@@ -10736,7 +10738,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 1a6841647031a1440a3a81262422bbea, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3096a53208f4ca24fa221c7aa55033f0, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
