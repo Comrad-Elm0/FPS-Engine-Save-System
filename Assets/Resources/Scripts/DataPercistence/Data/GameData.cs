@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using cowsins;
 using UnityEngine;
 
@@ -15,12 +16,17 @@ public class GameData
     public int playerLvl;
     public int coins;
     
-    public int primaryWeaponAmmoCount;
-    public int secondaryWeaponAmmoCount;
+    //public int primaryWeaponAmmoCount;
+    //public int secondaryWeaponAmmoCount;
+
+    public List<int> ammoCount;
+    
     public int currentWeaponInt;
 
-    public Weapon_SO weaponOne;
-    public Weapon_SO weaponTwo;
+    /*public Weapon_SO weaponOne;
+    public Weapon_SO weaponTwo;*/
+
+    public List<Weapon_SO> weapons;
 
     public string timeSaved;
     
@@ -39,8 +45,8 @@ public class GameData
         playerCameraRotation = Quaternion.identity;
         playerLvl = 0;
         coins = 0;
-        weaponOne = null;
-        weaponTwo = null;
+        //weaponOne = null;
+        //weaponTwo = null;
         timeSaved = System.DateTime.Now.ToString();
         currentScene = "Level One";
     }
