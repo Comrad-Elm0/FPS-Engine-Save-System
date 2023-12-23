@@ -3006,17 +3006,6 @@ MonoBehaviour:
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
---- !u!114 &1484667287 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5208174846014724355, guid: 02c9985461f21264daf97734b9198f20, type: 3}
-  m_PrefabInstance: {fileID: 4276334004255407132}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1596513517
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3071,7 +3060,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2360782869920273689, guid: dfea1f21607ef4d45b9112679cd344ce, type: 3}
       propertyPath: useEncryption
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2360782869920273689, guid: dfea1f21607ef4d45b9112679cd344ce, type: 3}
       propertyPath: firstLevelName
@@ -4391,10 +4380,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: SaveSlot
       objectReference: {fileID: 0}
-    - target: {fileID: 5792787550945196133, guid: 02c9985461f21264daf97734b9198f20, type: 3}
-      propertyPath: saveName
-      value: 
-      objectReference: {fileID: 1484667287}
     - target: {fileID: 5792787550945196133, guid: 02c9985461f21264daf97734b9198f20, type: 3}
       propertyPath: clearData
       value: 

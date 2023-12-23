@@ -2,22 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class SaveSlot : MonoBehaviour
 {
-    [Header("Profile")]
-    [SerializeField] string profileId = "";
+    [Header("Profile")] 
+    [SerializeField] private string profileId = "";
 
-    [Header("Content")]
-    [SerializeField] GameObject noDataContent;
-    [SerializeField] GameObject hasDataContent;
-    [SerializeField] TextMeshProUGUI saveName;
+    [Header("Content")] 
+    [SerializeField] private GameObject noDataContent;
+    [SerializeField] private GameObject hasDataContent;
+    [SerializeField] private TextMeshProUGUI saveName;
+    [SerializeField] private TextMeshProUGUI playerLevelText;
+    [SerializeField] private TextMeshProUGUI coinsText;
+    [SerializeField] private TextMeshProUGUI lastPlayedText;
 
-    [Header("Clear Data Button")]
-    [SerializeField] Button clearData;
 
-    Button saveSlotButton;
+    [Header("Clear Data Button")] 
+    [SerializeField] private Button clearData;
+
+    private Button saveSlotButton;
 
     private void Awake()
     {
@@ -38,6 +43,9 @@ public class SaveSlot : MonoBehaviour
             hasDataContent.SetActive(true);
             clearData.gameObject.SetActive(true);
             saveName.text = data.currentScene;
+            playerLevelText.text = $"LEVEL: {data.playerLvl.ToString()}";
+            coinsText.text = $"COINS: {data.coins.ToString()}";
+            lastPlayedText.text = $"LAST SAVED: {data.timeSaved}";
         }
     }
 

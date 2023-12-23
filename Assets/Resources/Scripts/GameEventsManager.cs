@@ -1,4 +1,3 @@
-using System;
 using cowsins;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -50,6 +49,10 @@ public class GameEventsManager : MonoBehaviour, IDataPersistence
         _playerMovement.transform.position = gameData.playerPosition;
         _playerStats.health = gameData.playerHealth;
         _playerStats.shield = gameData.playerShield;
+        _playerStats.maxHealth = gameData.maxHealth;
+        _playerStats.maxShield = gameData.maxShield;
+        _playerStats.damageMultiplier = gameData.damageMultiplier;
+        _playerStats.healMultiplier = gameData.healMultiplier;
         _camera.transform.rotation = gameData.playerCameraRotation;
         _camera.GetComponentInParent<MoveCamera>().transform.rotation = gameData.playerRotation;
         _experienceManager.playerLevel = gameData.playerLvl;
@@ -81,6 +84,7 @@ public class GameEventsManager : MonoBehaviour, IDataPersistence
 
         _controller.SelectWeapon();
         
+        // Update UI
         _uiController.UpdateHealthUI(gameData.playerHealth, gameData.playerShield, true);
         _uiController.UpdateCoins(gameData.coins);
         _uiController.UpdateXP();
@@ -93,6 +97,10 @@ public class GameEventsManager : MonoBehaviour, IDataPersistence
         gameData.playerPosition = _playerMovement.transform.position;
         gameData.playerHealth = _playerStats.health;
         gameData.playerShield = _playerStats.shield;
+        gameData.maxHealth = _playerStats.maxHealth;
+        gameData.maxShield = _playerStats.maxShield;
+        gameData.damageMultiplier = _playerStats.damageMultiplier;
+        gameData.healMultiplier = _playerStats.healMultiplier;
         gameData.playerCameraRotation = _camera.transform.rotation;
         gameData.playerRotation = _camera.GetComponentInParent<MoveCamera>().transform.rotation;
         gameData.playerLvl = _experienceManager.playerLevel + 1;
@@ -105,6 +113,6 @@ public class GameEventsManager : MonoBehaviour, IDataPersistence
         gameData.weaponTwo = _controller.inventory[1].weapon;
         
         gameData.currentWeaponInt = _controller.currentWeapon;
-
+        gameData.timeSaved = System.DateTime.Now.ToString();
     }
 }
