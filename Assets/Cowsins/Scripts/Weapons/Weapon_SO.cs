@@ -59,6 +59,7 @@ namespace cowsins
     #endregion
 
     #region weaponScriptableObject
+    [System.Serializable]
     [CreateAssetMenu(fileName = "NewWeapon", menuName = "COWSINS/New Weapon", order = 1)]
     public class Weapon_SO : ScriptableObject
     {

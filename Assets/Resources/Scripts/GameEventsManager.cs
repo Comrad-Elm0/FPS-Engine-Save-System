@@ -127,69 +127,34 @@ public class GameEventsManager : MonoBehaviour, IDataPersistence
         gameData.playerRotation = _camera.GetComponentInParent<MoveCamera>().transform.rotation;
         gameData.playerLvl = _experienceManager.playerLevel + 1;
         gameData.coins = _coinManager.coins;
-        
-        //gameData.primaryWeaponAmmoCount = _controller.inventory[0].bulletsLeftInMagazine;
-        //gameData.secondaryWeaponAmmoCount = _controller.inventory[1].bulletsLeftInMagazine;
-        
-        //gameData.weaponOne = _controller.inventory[0].weapon;
-        //gameData.weaponTwo = _controller.inventory[1].weapon;
-
-        //gameData.weapons = new List<Weapon_SO>(_controller.inventorySize);
-        //gameData.ammoCount = new List<int>(_controller.inventorySize);
 
         foreach (var weapon in _controller.inventory)
         {
-            /*if (gameData.weapons.Contains(weapon.weapon))
+            if (gameData.weapons.Count > _controller.inventory.Length - 1)
             {
-                int index = gameData.weapons.IndexOf(weapon.weapon);
-                
-                gameData.weapons[index].weaponObject.weapon = weapon.weapon;
-                Debug.LogWarning("Weapon already exists");
-                //gameData.weapons.Remove(gameData.weapons[index].weaponObject.weapon);
-            }
-            else
-            {
-                gameData.weapons.Add(weapon.weapon);
-            }*/
-
-            /*if (gameData.ammoCount.Contains(weapon.bulletsLeftInMagazine))
-            {
-                int index = gameData.ammoCount.IndexOf(weapon.bulletsLeftInMagazine);
-
-                gameData.weapons[index].weaponObject.weapon = weapon.weapon;
-                Debug.LogWarning("Ammo already exists");
-            }
-            else
-            {
-                gameData.ammoCount.Add(weapon.bulletsLeftInMagazine);
-            }*/
-
-            int weaponAmmoIndex = gameData.ammoCount.IndexOf(weapon.bulletsLeftInMagazine);
-            int weaponIndex = gameData.weapons.IndexOf(weapon.weapon);
-            
-            if (gameData.weapons.Contains(weapon.weapon))
-            {
-                gameData.weapons[weaponIndex].weaponObject.weapon = weapon.weapon;
+                gameData.weapons.Clear();
+                if (gameData.weapons.Count <= 1)
+                {
+                    gameData.weapons.Add(weapon.weapon);
+                }
             }
             else
             {
                 gameData.weapons.Add(weapon.weapon);
             }
 
-            if (gameData.ammoCount.Contains(weapon.bulletsLeftInMagazine))
+            if (gameData.ammoCount.Count > _controller.inventory.Length - 1)
             {
-                int oldAmmoIndex = gameData.ammoCount.IndexOf(weapon.bulletsLeftInMagazine);
-                gameData.weapons[oldAmmoIndex].weaponObject.bulletsLeftInMagazine = weapon.bulletsLeftInMagazine;
+                gameData.ammoCount.Clear();
+                if (gameData.ammoCount.Count <= 1)
+                {
+                    gameData.ammoCount.Add(weapon.bulletsLeftInMagazine);
+                }
             }
             else
             {
                 gameData.ammoCount.Add(weapon.bulletsLeftInMagazine);
             }
-            
-            
-
-            //gameData.ammoCount.Add(weapon.bulletsLeftInMagazine);
-            //gameData.weapons.Add(weapon.weapon);
         }
 
         gameData.currentWeaponInt = _controller.currentWeapon;
